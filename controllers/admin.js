@@ -1,9 +1,7 @@
 const Product = require('../models/product');
 
 exports.getAddProduct = (req, res, next) => {
-  const loggedIn = req.session.isLoggedIn;
-
-  if(!loggedIn) {
+  if(!req.session.isLoggedIn) {
     return res.redirect('/login');
   }
 
@@ -11,7 +9,7 @@ exports.getAddProduct = (req, res, next) => {
     pageTitle: 'Add Product',
     path: '/admin/add-product',
     editing: false,
-    isAuthenticated: loggedIn
+    isAuthenticated: req.session.isLoggedIn
   });
 };
 
@@ -47,7 +45,6 @@ exports.getEditProduct = (req, res, next) => {
     return res.redirect('/');
   }
   const prodId = req.params.productId;
-  const loggedIn = req.session.isLoggedIn;
 
   Product
   .findById(prodId)
@@ -60,7 +57,7 @@ exports.getEditProduct = (req, res, next) => {
       path: '/admin/edit-product',
       editing: editMode,
       product: product,
-      isAuthenticated: loggedIn
+      isAuthenticated: req.session.isLoggedIn
     });
   })
   .catch(err => {console.log(err)});
@@ -92,8 +89,6 @@ exports.postEditProduct = (req, res, next) => {
 };
 
 exports.getProducts = (req, res, next) => {
-  const loggedIn = req.session.isLoggedIn;
-
   Product
   .find()
   //.select('title price -_id')   // function available after find(), to select only certain documents from the collection. In example, show only 'title', 'price', & DONOT show '_id' (using '-' infront)
@@ -110,7 +105,7 @@ exports.getProducts = (req, res, next) => {
       prods: products,
       pageTitle: 'Admin Products',
       path: '/admin/products',
-      isAuthenticated: loggedIn
+      isAuthenticated: req.session.isLoggedIn
     });
   })
   .catch(err => {console.log(err)});
