@@ -1,4 +1,5 @@
 const User = require('../models/user');
+const bcrypt = require('bcryptjs');
 
 exports.getAuth = (req, res, next) => {
     console.log('getAuth_session..... ', req.session); // get session
@@ -48,17 +49,26 @@ exports.postSignup = (req, res, next) => {
 
     User.findOne({email: email})
     .then(userDoc => {
+        console.log('postSignup_userDoc..... ', userDoc);
+
         if (userDoc) {
             return res.redirect('/signup');
         }
+        return bcrypt.hash(password, 12);   // the higher the salt, the more secure https://github.com/dcodeIO/bcrypt.js
+    })
+    .then(hashedPassword => {
+        console.log('postSignup_hashedPassword..... ', hashedPassword);
 
-        const user = new User({
-            email: email,
-            password: password,
-            cart: { items: [] }
-        });
-
-        return user.save();
+        if(hashedPassword) {
+            const user = new User({
+                email: email,
+                password: hashedPassword,
+                cart: { items: [] }
+            });
+    
+            return user.save();
+        }
+        return null;
     })
     .then(result => {
         console.log('postSignup_result..... ', result);
