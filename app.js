@@ -48,6 +48,14 @@ app.use((req, res, next) => {   // this will be run when there is any incoming r
     })
     .catch(err => {console.log(err)});
 });
+
+app.use((req, res, next) => {
+    // with the following code, 'isAuthenticated' & 'csrfToken' will be passed during pages rendering (can do like this globally at once rather than do it one by one per render)
+    res.locals.isAuthenticated = req.session.isLoggedIn;
+    res.locals.csrfToken = req.csrfToken();
+    next();
+});
+
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);
