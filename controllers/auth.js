@@ -30,7 +30,7 @@ exports.postAuth = (req, res, next) => {
     .then(passwordMatch => {
         console.log('postAuth_passwordMatch..... ', passwordMatch);
 
-        if(passwordMatch) {
+        if(passwordMatch) {    // bcrypt.compare will return Promise of true or false. True if password match and False if not match
             req.session.isLoggedIn = true;     // set a property in session
             req.session.user = currentUser;
             req.session.save(err => {   // save the above set session before redirect just as guarantee the session is set before redirecting
