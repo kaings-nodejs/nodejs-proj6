@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
+const csrf = require('csurf');
 
 const errorController = require('./controllers/error');
 const User = require('./models/user');
@@ -32,6 +33,7 @@ app.use(
         saveUninitialized: false, 
         store: store })     // more details: https://github.com/expressjs/session
 );
+app.use(csrf());    // csrf is always after the session is initiated because it needs to use the session to implement
 
 app.use((req, res, next) => {   // this will be run when there is any incoming request. it is put on top of all routes. All incoming request will trigger this middleware
     if(!req.session.user) {    // proceed without setting user in the request if there is no user found
