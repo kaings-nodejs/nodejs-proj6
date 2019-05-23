@@ -6,7 +6,8 @@ exports.getAuth = (req, res, next) => {
 
     res.render('auth/login', {
         path: '/login',
-        pageTitle: 'Login'
+        pageTitle: 'Login',
+        errMessage: req.flash('error')
     });
 };
 
@@ -21,6 +22,7 @@ exports.postAuth = (req, res, next) => {
         currentUser = user;
 
         if(!user) {
+            req.flash('error', 'Invalid Email or Password!');
             return res.redirect('/login');
         }
 
@@ -46,7 +48,8 @@ exports.postAuth = (req, res, next) => {
 exports.getSignup = (req, res, next) => {
     res.render('auth/signup', {
       path: '/signup',
-      pageTitle: 'Signup'
+      pageTitle: 'Signup',
+      errMessage: req.flash('error')
     });
 };
 
@@ -60,6 +63,7 @@ exports.postSignup = (req, res, next) => {
         console.log('postSignup_userDoc..... ', userDoc);
 
         if (userDoc) {
+            req.flash('error', 'Email Exist! Please Use Other Email!')
             return res.redirect('/signup');
         }
         return bcrypt.hash(password, 12);   // the higher the salt, the more secure https://github.com/dcodeIO/bcrypt.js
