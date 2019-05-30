@@ -1,5 +1,13 @@
 const User = require('../models/user');
 const bcrypt = require('bcryptjs');
+const nodemailer = require('nodemailer');
+const sgTransport = require('nodemailer-sendgrid-transport');
+
+const mailer = nodemailer.createTransport(sgTransport({
+    auth: {
+        api_key: '' // SendGrid API_KEY
+    }
+}));
 
 exports.getAuth = (req, res, next) => {
     console.log('getAuth_session..... ', req.session); // get session
@@ -87,7 +95,30 @@ exports.postSignup = (req, res, next) => {
 
         if(result) {
             res.redirect('/login');
+
+            const mailDetails = {
+                to: email,
+                from: 'dummy@test.com',
+                subject: 'Hi there',
+                text: 'Awesome sauce',
+                html: '<b>Awesome sauce</b>'
+            };
+
+            /* Note:
+            It is better NOT to wait sending email process to finish before redirecting (make the 2 process asynchronous as this one is better)
+            the reason is if emails to be sent is alot, it will be long waiting before redirecting
+             */
+
+            //this code works as well but without returning promise
+            // mailer.sendMail(mailDetails, (err, res) => {
+            //     console.log('mailer.sendMail..... ', res, '\n', err);
+            // });
+
+            return mailer.sendMail(mailDetails);    // the one with returning promise
         }
+    })
+    .then(sendMail_result => {
+        console.log('postSignup_sendMail_result..... ', sendMail_result);
     })
     .catch(err => {console.log(err)});
 };
